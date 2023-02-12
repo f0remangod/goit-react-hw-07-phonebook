@@ -1,14 +1,14 @@
-import { nanoid } from 'nanoid';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import { Form, Btn } from './PhonebookForm.styled';
 import { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { addContact } from 'redux/contactsSlice';
+import {
+  useGetContactsQuery,
+  useAddContactMutation,
+} from '../../../redux/contactsSlice';
 
 export const PhonebookForm = () => {
-  const dispatch = useDispatch();
-
-  const contacts = useSelector(state => state.contacts);
+  const { data } = useGetContactsQuery();
+  const [addContact] = useAddContactMutation();
 
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
@@ -28,15 +28,14 @@ export const PhonebookForm = () => {
     }
   };
 
-  const handleFormSubmit = event => {
+  const handleFormSubmit = async event => {
     event.preventDefault();
     const contact = {
-      id: nanoid(),
       name,
-      number,
+      phone: number,
     };
 
-    const alreadyExists = contacts.findIndex(item => {
+    const alreadyExists = data.findIndex(item => {
       const existingItem = item.name.toLowerCase();
       const newItem = contact.name.toLowerCase();
       return existingItem === newItem;
@@ -47,7 +46,7 @@ export const PhonebookForm = () => {
         Notify.failure(`${contact.name} is already in contacts`);
         break;
       default:
-        dispatch(addContact(contact));
+        await addContact(contact);
     }
 
     resetForm();
@@ -65,6 +64,7 @@ export const PhonebookForm = () => {
         name="name"
         value={name}
         placeholder="Enter name"
+        autoComplete="off"
         pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
         title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
         onChange={handleInputChange}
@@ -75,6 +75,7 @@ export const PhonebookForm = () => {
         name="number"
         value={number}
         placeholder="Enter phone number"
+        autoComplete="off"
         pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
         title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
         onChange={handleInputChange}

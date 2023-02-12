@@ -1,14 +1,16 @@
 import { ContactsItem } from 'components/PhonebookComponents/ContactsItem/ContactsItem';
 import { useSelector } from 'react-redux';
 import { List } from './ContactsList.styled';
+import { useGetContactsQuery } from '../../../redux/contactsSlice';
 
 export const ContactsList = () => {
-  const contacts = useSelector(state => state.contacts);
+  const { data, error, isLoading } = useGetContactsQuery();
+
   const filter = useSelector(state => state.filter);
 
   const getFilteredContacts = () => {
     const normalizedFilter = filter.toLowerCase().trim();
-    return contacts.filter(contact =>
+    return data.filter(contact =>
       contact.name.toLowerCase().includes(normalizedFilter)
     );
   };

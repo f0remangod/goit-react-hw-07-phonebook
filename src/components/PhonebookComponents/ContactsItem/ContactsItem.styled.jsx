@@ -1,7 +1,10 @@
 import styled from 'styled-components';
 
 export const Name = styled.p`
+  overflow: hidden;
+  white-space: nowrap;
   width: 150px;
+  font-weight: 600;
 `;
 
 export const Item = styled.li`
